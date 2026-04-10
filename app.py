@@ -1,5 +1,6 @@
 from flask import Flask, request, redirect, session
 import sqlite3
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = "123"
@@ -159,9 +160,19 @@ def agendar():
     conn = db()
     c = conn.cursor()
 
-    c.execute("SELECT * FROM agendamentos WHERE data=? AND hora=?", (data, hora))
-    if c.fetchone():
-        return "<h2>Horário ocupado</h2><a href='/'>Voltar</a>"
+    # 🔥 NOVA REGRA DE 30 MINUTOS
+    c.execute("SELECT hora FROM agendamentos WHERE data=?", (data,))
+    horarios = c.fetchall()
+
+    hora_nova = datetime.strptime(hora, "%H:%M")
+
+    for h in horarios:
+        hora_existente = datetime.strptime(h[0], "%H:%M")
+        diferenca = abs((hora_nova - hora_existente).total_seconds() / 60)
+
+        if diferenca < 30:
+            conn.close()
+            return "<h2>Horário muito próximo de outro agendamento (mínimo 30min)</h2><a href='/'>Voltar</a>"
 
     c.execute("INSERT INTO agendamentos (nome,data,hora,servico,status) VALUES (?,?,?,?,?)",
               (nome,data,hora,servico,"Agendado"))
