@@ -29,7 +29,7 @@ def init():
 
 init()
 
-# HOME
+# HOME (🔥 VISUAL PROFISSIONAL)
 @app.route("/")
 def home():
     return """
@@ -46,17 +46,25 @@ def home():
         color:white;
     }
 
-    .topo {
+    .hero {
+        height:90vh;
+        background:url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438') center/cover;
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+        align-items:center;
         text-align:center;
-        padding:60px 20px;
-        background:linear-gradient(black,#111);
     }
 
-    .topo h1 { font-size:32px; color:gold; }
+    .hero h1 {
+        font-size:40px;
+        color:gold;
+        text-shadow:2px 2px 10px black;
+    }
 
     .btn {
         background:gold;
-        padding:15px;
+        padding:15px 25px;
         border-radius:10px;
         text-decoration:none;
         color:black;
@@ -64,16 +72,28 @@ def home():
     }
 
     .container {
-        max-width:420px;
+        max-width:900px;
         margin:auto;
         padding:20px;
     }
 
+    .section {
+        margin-top:40px;
+    }
+
+    .servicos {
+        display:flex;
+        gap:15px;
+        flex-wrap:wrap;
+    }
+
     .card {
+        flex:1;
+        min-width:250px;
         background:#1c1c1c;
         padding:20px;
         border-radius:15px;
-        margin-top:20px;
+        text-align:center;
     }
 
     input, select {
@@ -95,36 +115,44 @@ def home():
         cursor:pointer;
     }
 
-    .servico {
-        display:flex;
-        justify-content:space-between;
-        padding:10px 0;
-        border-bottom:1px solid #333;
+    a {
+        color:gold;
+        text-align:center;
+        display:block;
+        margin-top:20px;
     }
-
-    a { color:gold; text-align:center; display:block; margin-top:20px; }
     </style>
     </head>
 
     <body>
 
-    <div class="topo">
+    <div class="hero">
         <h1>💈 Barbearia Paulista</h1>
-        <p>Estilo e qualidade</p>
+        <p>Estilo e experiência premium</p>
         <a href="#agendar" class="btn">Agendar Agora</a>
     </div>
 
     <div class="container">
 
-    <div class="card">
-        <h3>Serviços</h3>
-        <div class="servico"><span>Corte</span><span>R$30</span></div>
-        <div class="servico"><span>Barba</span><span>R$20</span></div>
-        <div class="servico"><span>Completo</span><span>R$45</span></div>
+    <div class="section">
+        <h2 style="text-align:center;color:gold;">Serviços</h2>
+
+        <div class="servicos">
+            <div class="card"><h3>Corte</h3><p>R$30</p></div>
+            <div class="card"><h3>Barba</h3><p>R$20</p></div>
+            <div class="card"><h3>Completo</h3><p>R$45</p></div>
+        </div>
     </div>
 
-    <div class="card" id="agendar">
-        <h3>Agendar</h3>
+    <div class="section">
+        <h2 style="text-align:center;color:gold;">Sobre</h2>
+        <p style="text-align:center;">
+        Ambiente moderno com estilo clássico, oferecendo qualidade e conforto.
+        </p>
+    </div>
+
+    <div class="section" id="agendar">
+        <h2 style="text-align:center;color:gold;">Agendar</h2>
 
         <form action="/agendar" method="POST">
             <input name="nome" placeholder="Nome" required>
@@ -149,7 +177,7 @@ def home():
     </html>
     """
 
-# AGENDAR
+# AGENDAR (🔥 COM REGRA DE 30 MIN)
 @app.route("/agendar", methods=["POST"])
 def agendar():
     nome = request.form["nome"]
@@ -160,7 +188,6 @@ def agendar():
     conn = db()
     c = conn.cursor()
 
-    # 🔥 NOVA REGRA DE 30 MINUTOS
     c.execute("SELECT hora FROM agendamentos WHERE data=?", (data,))
     horarios = c.fetchall()
 
@@ -172,7 +199,7 @@ def agendar():
 
         if diferenca < 30:
             conn.close()
-            return "<h2>Horário muito próximo de outro agendamento (mínimo 30min)</h2><a href='/'>Voltar</a>"
+            return "<h2>Horário muito próximo (mínimo 30min)</h2><a href='/'>Voltar</a>"
 
     c.execute("INSERT INTO agendamentos (nome,data,hora,servico,status) VALUES (?,?,?,?,?)",
               (nome,data,hora,servico,"Agendado"))
@@ -235,7 +262,6 @@ def painel():
     <html>
     <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <style>
     body {{ background:#0d0d0d; color:white; font-family:Segoe UI; }}
     .container {{ max-width:700px; margin:auto; padding:20px; }}
